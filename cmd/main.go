@@ -104,7 +104,13 @@ func main() {
 		panic(err)
 	}
 
-	client.SetToken(os.Getenv("VAULT_TOKEN"))
+	token, err := getVaultToken(client, logger)
+	if err != nil {
+		failCounter.WithLabelValues(name, err.Error()).Inc()
+		panic(err)
+	}
+
+	client.SetToken(token)
 
 	backupData, err := vault.NewVault(client).Backup(ctx)
 	if err != nil {

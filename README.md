@@ -45,6 +45,8 @@ The following environment variables are used to configure the behavior of the Va
 - `VAULT_NAME`: Customize the name of your Vault instance. This is used primarily for Prometheus metrics.
 - `PROMETHEUS_PUSH_GATEWAY_URL`: The URL to the Prometheus Pushgateway. This is optional and should only be set if you want to enable Prometheus metrics.
 - `VAULT_URLS`: A comma-separated list of Vault URLs, e.g., `https://vault1:8200,https://vault2:8200`. The application will try to connect using these URLs.
+- `AUTH_TYPE`: Auth type for vault. Supported: kubernetes,vault_token
+- `KUBERNETES_ROLE`: (optional) required if `AUTH_TYPE` = kubernetes. Name of role\service account.
 - `VAULT_TOKEN`: A Vault token with the following access policy applied:
 ```hcl
 path "sys/storage/raft/snapshot" {
