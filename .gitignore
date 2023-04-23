@@ -19,3 +19,9 @@
 
 # Go workspace file
 go.work
+
+ci/s3buckets/backup/2023/
+
+ci/s3buckets/.minio.sys/
+
+coverage.txt

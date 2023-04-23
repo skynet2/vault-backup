@@ -2,6 +2,8 @@ version: '2.4'
 services:
   vault.local:
     image: vault:latest
+    command:
+      - server
     cap_add:
       - IPC_LOCK
     volumes:
@@ -9,8 +11,6 @@ services:
 #      - "./vault/data:/vault/data"
     ports:
       - "8200:8200"
-    networks:
-      - net1
   s3.local:
     container_name: s3.local
     image: minio/minio
@@ -18,9 +18,7 @@ services:
     environment:
       - MINIO_ROOT_USER=ROOTUSER
       - MINIO_ROOT_PASSWORD=CHANGEME123
-      - MINIO_BROWSER=off
-    networks:
-      - net1
+#      - MINIO_BROWSER=off
     ports:
       - "9000:9000"
       - "9090:9090"
