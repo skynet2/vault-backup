@@ -20,6 +20,10 @@ Vault-Backup is an automatic backup solution for HashiCorp Vault. The project is
 - Access to an S3-compatible storage service (e.g., Amazon S3)
 - (Optional) A running Prometheus instance for metrics collection
 
+## Example
+
+An example Kubernetes CronJob configuration using Vault-Backup with the HashiCorp Vault Agent Sidecar Injector can be found in the [example directory](https://github.com/skynet2/vault-backup/tree/master/example) of this repository. The example demonstrates how to set up a scheduled backup job for HashiCorp Vault in a Kubernetes environment.
+
 ## Installation
 
 ### Docker

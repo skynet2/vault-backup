@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vault-backup-job
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          annotations:
+            vault.hashicorp.com/agent-inject: "true"
+            vault.hashicorp.com/role: vault-backup
+            vault.hashicorp.com/agent-inject-status: "update"
+            vault.hashicorp.com/agent-inject-secret-meta.json: "vaultbackup/secretkv"
+            vault.hashicorp.com/agent-pre-populate-only : "true"
+            vault.hashicorp.com/agent-inject-template-meta.json: |
+              {{ printf `{{- with secret "%s" -}}
+                {{- .Data.data | toJSONPretty }}
+              {{- end }}` "vaultbackup/secretkv" }}
+        spec:
+          serviceAccountName: vault-backup
+          containers:
+              - name: backup-job
+                image: skydev/vault-backup
+                imagePullPolicy: Always
+                env:
+                  - name: VAULT_SECRETS_PATH
+                    value: "/vault/secrets/"
+                  - name: VAULT_NAME
+                    value: "dta-vault"
+                  - name: PROMETHEUS_PUSH_GATEWAY_URL
+                    value: http://prometheus-kube-prometheus-prometheus.prometheus.svc.cluster.local:9090
+                  - name: VAULT_URLS
+                    value: "http://vault-0.vault-internal:8200,http://vault-1.vault-internal:8200,http://vault-2.vault-internal:8200"
+                  - name: AUTH_TYPE
+                    value: kubernetes
+                  - name: KUBERNETES_ROLE
+                    value: vault-backup
+          restartPolicy: OnFailure
