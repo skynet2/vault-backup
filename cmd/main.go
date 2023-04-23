@@ -43,6 +43,7 @@ func registerMetrics() {
 }
 
 func main() {
+	// trigger build
 	logger := log.Logger
 	registerMetrics()
 
