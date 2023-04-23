@@ -1,0 +1,32 @@
+version: '2.4'
+services:
+  vault.local:
+    image: vault:latest
+    command:
+      - server
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - "./vault.hcl:/vault/config/vault.hcl"
+      - "./backup:/backup"
+    ports:
+      - "8200:8200"
+  s3.local:
+    container_name: s3.local
+    image: minio/minio
+    restart: always
+    environment:
+      - MINIO_ROOT_USER=ROOTUSER
+      - MINIO_ROOT_PASSWORD=CHANGEME123
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    volumes:
+      - ./s3buckets:/data/
+    command: server /data --console-address ":9090"
+    healthcheck:
+      test: [ "CMD", "curl", "-f -k", "http://s3.local:9000/minio/health/live" ]
+      interval: 5s
+      timeout: 60s
+      retries: 10
+      start_period: 5s
