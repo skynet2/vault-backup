@@ -25,12 +25,23 @@ var (
 		Name: "vault_backup_errors_total",
 		Help: "The total number of errors during backups",
 	}, []string{"vault_name", "err_text"})
+
+	isRegistered = false
 )
+
+func registerMetrics() {
+	if isRegistered {
+		return
+	}
+
+	prometheus.MustRegister(successCounter)
+	prometheus.MustRegister(failCounter)
+	isRegistered = true
+}
 
 func main() {
 	logger := log.Logger
-	prometheus.MustRegister(successCounter)
-	prometheus.MustRegister(failCounter)
+	registerMetrics()
 
 	name := os.Getenv("VAULT_NAME")
 	if name == "" {
@@ -46,7 +57,7 @@ func main() {
 	s3Destination, err := desitnation.NewS3()
 	if err != nil {
 		failCounter.WithLabelValues(name, err.Error()).Inc()
-		logger.Panic().Err(err).Send()
+		panic(err)
 	}
 
 	client, err := vault2.NewClient(&vault2.Config{
@@ -56,7 +67,7 @@ func main() {
 	ctx := logger.WithContext(context.Background())
 	if err != nil {
 		failCounter.WithLabelValues(name, err.Error()).Inc()
-		logger.Panic().Err(err).Send()
+		panic(err)
 	}
 
 	client.SetToken(os.Getenv("VAULT_TOKEN"))
@@ -64,7 +75,7 @@ func main() {
 	backupData, err := vault.NewVault(client).Backup(ctx)
 	if err != nil {
 		failCounter.WithLabelValues(name, err.Error()).Inc()
-		logger.Panic().Err(err).Send()
+		panic(err)
 	}
 
 	tt := time2.Now().UTC()
@@ -77,7 +88,7 @@ func main() {
 
 	if err = s3Destination.Upload(ctx, finalPath, backupData); err != nil {
 		failCounter.WithLabelValues(name, err.Error()).Inc()
-		logger.Panic().Err(err).Send()
+		panic(err)
 	}
 
 	successCounter.WithLabelValues(name).Inc()

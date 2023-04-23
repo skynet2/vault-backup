@@ -18,7 +18,7 @@ import (
 
 func TestS3Success(t *testing.T) {
 	t.Setenv("VAULT_CLUSTER_URL", "http://localhost:8200")
-	t.Setenv("VAULT_CLUSTER_ROOT_TOKEN", "hvs.8sgDMEfWgExt26Zn0V3A2k3H")
+	t.Setenv("VAULT_CLUSTER_ROOT_TOKEN", "hvs.tG61uyzsDeYV3kya6q7ujqH1")
 	logger := log.Logger
 
 	vaultUrl := os.Getenv("VAULT_CLUSTER_URL")
@@ -59,7 +59,64 @@ func TestS3Success(t *testing.T) {
 
 	_ = app.Shutdown()
 	assert.True(t, gotMetrics)
-	//fmt.Println(initResp)
+}
+
+func TestInvalidUrl(t *testing.T) {
+	t.Setenv("VAULT_CLUSTER_URL", "http://localhost:8200")
+	t.Setenv("VAULT_CLUSTER_ROOT_TOKEN", "hvs.tG61uyzsDeYV3kya6q7ujqH1")
+	logger := log.Logger
+
+	vaultUrl := os.Getenv("VAULT_CLUSTER_URL")
+	if err := waitCluster(vaultUrl, logger); err != nil {
+		logger.Panic().Err(err).Send()
+	}
+
+	initResp, err := initCluster(vaultUrl)
+	if err != nil {
+		log.Fatal().Err(err).Send()
+	}
+
+	t.Setenv("VAULT_NAME", "e2e")
+	t.Setenv("VAULT_URL", "http://127.0.0.1:8555") // invalid url
+	t.Setenv("VAULT_TOKEN", initResp.RootToken)
+
+	t.Setenv("S3_ACCESS_KEY", "ROOTUSER")
+	t.Setenv("S3_SECRET_KEY", "CHANGEME123")
+	t.Setenv("S3_ENDPOINT", "http://127.0.0.1:9000")
+	t.Setenv("S3_DISABLE_SSL", "true")
+	t.Setenv("S3_REGION", "any")
+	t.Setenv("S3_BUCKET", "backup")
+
+	t.Setenv("PROMETHEUS_PUSH_GATEWAY_URL", "http://127.0.0.1:55821")
+
+	gotMetrics := false
+	app := fiber.New()
+	app.Put("/metrics/job/default_job", func(ctx *fiber.Ctx) error {
+		gotMetrics = true
+		ctx.Status(http.StatusOK)
+		return nil
+	})
+
+	go func() {
+		_ = app.Listen(":55821")
+	}()
+
+	ch := make(chan error)
+	go func() {
+		defer func() {
+			if panicErr := recover(); panicErr != nil {
+				ch <- panicErr.(error)
+			}
+		}()
+
+		main()
+		ch <- nil
+	}()
+
+	_ = app.Shutdown()
+	finalErr := <-ch
+	assert.ErrorContains(t, finalErr, "dial tcp")
+	assert.True(t, gotMetrics)
 }
 
 type initResponse struct {
