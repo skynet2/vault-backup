@@ -1,4 +1,11 @@
 # Vault-Backup 
+
+![build workflow](https://github.com/skynet2/vault-backup/actions/workflows/release.yaml/badge.svg?branch=master)
+[![codecov](https://codecov.io/gh/skynet2/vault-backup/branch/master/graph/badge.svg?token=LAARF8BFLO)](https://codecov.io/gh/skynet2/vault-backup)
+[![go-report](https://goreportcard.com/badge/github.com/skynet2/vault-backup?nocache=true)](https://goreportcard.com/report/github.com/skynet2/vault-backup)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/skynet2/vault-backup)](https://pkg.go.dev/github.com/skynet2/vault-backup?tab=doc)
+
+## Description
 Vault-Backup is an automatic backup solution for HashiCorp Vault. The project is designed to run as a Docker container or a standalone binary and supports the backup of Vault data to remote destinations such as AWS S3. The project also has Prometheus metrics support, which can be enabled using an environment variable.
 
 ## Features
