@@ -47,6 +47,10 @@ func main() {
 	logger := log.Logger
 	registerMetrics()
 
+	if vaultSecretsErr := checkVault(os.Getenv("VAULT_SECRETS_PATH"), logger); vaultSecretsErr != nil {
+		panic(vaultSecretsErr)
+	}
+
 	name := os.Getenv("VAULT_NAME")
 	if name == "" {
 		name = "default"
@@ -100,7 +104,13 @@ func main() {
 		panic(err)
 	}
 
-	client.SetToken(os.Getenv("VAULT_TOKEN"))
+	token, err := getVaultToken(client, logger)
+	if err != nil {
+		failCounter.WithLabelValues(name, err.Error()).Inc()
+		panic(err)
+	}
+
+	client.SetToken(token)
 
 	backupData, err := vault.NewVault(client).Backup(ctx)
 	if err != nil {

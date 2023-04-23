@@ -13,7 +13,7 @@ Vault-Backup is an automatic backup solution for HashiCorp Vault. The project is
 - Automated HashiCorp Vault backups
 - Supports AWS S3 as a backup destination
 - Prometheus metrics support with counters for successful and failed backup attempts
-
+- Automatically reads and applies environment variables from JSON files in a specified path when using the HashiCorp Vault Agent Sidecar Injector (see `VAULT_SECRETS_PATH`)
 ## Prerequisites
 
 - A running HashiCorp Vault instance
@@ -45,12 +45,15 @@ The following environment variables are used to configure the behavior of the Va
 - `VAULT_NAME`: Customize the name of your Vault instance. This is used primarily for Prometheus metrics.
 - `PROMETHEUS_PUSH_GATEWAY_URL`: The URL to the Prometheus Pushgateway. This is optional and should only be set if you want to enable Prometheus metrics.
 - `VAULT_URLS`: A comma-separated list of Vault URLs, e.g., `https://vault1:8200,https://vault2:8200`. The application will try to connect using these URLs.
+- `AUTH_TYPE`: Auth type for vault. Supported: kubernetes,vault_token
+- `KUBERNETES_ROLE`: (optional) required if `AUTH_TYPE` = kubernetes. Name of role\service account.
 - `VAULT_TOKEN`: A Vault token with the following access policy applied:
 ```hcl
 path "sys/storage/raft/snapshot" {
     capabilities = ["read"]
 }
 ```
+- `VAULT_SECRETS_PATH`: Path to HashiCorp Vault files. This is useful when using the HashiCorp Vault Agent Sidecar Injector. For more information, visit [Vault Agent Sidecar Injector documentation](https://developer.hashicorp.com/vault/docs/platform/k8s/injector). Files are expected to be in JSON format. The application will read the JSON files and apply the environment variables. Expected format: `{"key": "value"}`. (On linux system by default /vault/secrets/). **Disabled by default**.
 - S3 Configuration:
     - `S3_ACCESS_KEY`: Your S3 access key.
     - `S3_SECRET_KEY`: Your S3 secret key.
