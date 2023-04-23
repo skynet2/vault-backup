@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - master
-      - qa
-      - uat
 
 jobs:
   tests:

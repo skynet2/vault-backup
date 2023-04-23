@@ -18,7 +18,7 @@ import (
 
 func TestS3Success(t *testing.T) {
 	t.Setenv("VAULT_CLUSTER_URL", "http://localhost:8200")
-	t.Setenv("VAULT_CLUSTER_ROOT_TOKEN", "hvs.tG61uyzsDeYV3kya6q7ujqH1")
+	t.Setenv("VAULT_CLUSTER_ROOT_TOKEN", "hvs.TxXYRE97Cxyfv0s0MM2Yd5Rl")
 	logger := log.Logger
 
 	vaultUrl := os.Getenv("VAULT_CLUSTER_URL")

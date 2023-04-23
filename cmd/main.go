@@ -61,7 +61,7 @@ func main() {
 	}
 
 	client, err := vault2.NewClient(&vault2.Config{
-		Address: os.Getenv("VAULT_URL"),
+		Address: os.Getenv("VAULT_URLS"),
 	})
 
 	ctx := logger.WithContext(context.Background())
