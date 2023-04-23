@@ -32,7 +32,7 @@ func TestS3Success(t *testing.T) {
 	}
 
 	t.Setenv("VAULT_NAME", "e2e")
-	t.Setenv("VAULT_URL", "http://127.0.0.1:8200")
+	t.Setenv("VAULT_URLS", "https://127.0.0.1:12345,http://127.0.0.1:8200")
 	t.Setenv("VAULT_TOKEN", initResp.RootToken)
 
 	t.Setenv("S3_ACCESS_KEY", "ROOTUSER")
@@ -77,7 +77,7 @@ func TestInvalidUrl(t *testing.T) {
 	}
 
 	t.Setenv("VAULT_NAME", "e2e")
-	t.Setenv("VAULT_URL", "http://127.0.0.1:8555") // invalid url
+	t.Setenv("VAULT_URLS", "http://127.0.0.1:8555") // invalid url
 	t.Setenv("VAULT_TOKEN", initResp.RootToken)
 
 	t.Setenv("S3_ACCESS_KEY", "ROOTUSER")

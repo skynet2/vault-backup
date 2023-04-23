@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	time2 "time"
 
+	"github.com/hashicorp/go-multierror"
 	vault2 "github.com/hashicorp/vault/api"
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog/log"
 
@@ -60,9 +63,35 @@ func main() {
 		panic(err)
 	}
 
-	client, err := vault2.NewClient(&vault2.Config{
-		Address: os.Getenv("VAULT_URLS"),
-	})
+	var client *vault2.Client
+	var finalErr error
+	for _, url := range strings.Split(os.Getenv("VAULT_URLS"), ",") {
+		logger.Info().Msgf("connecting to %v", url)
+		vaultClient, clientErr := vault2.NewClient(&vault2.Config{
+			Address: url,
+		})
+
+		if clientErr != nil {
+			clientErr = errors.Wrapf(clientErr, "can not connect to %v", url)
+			finalErr = multierror.Append(finalErr, clientErr)
+			continue
+		}
+
+		_, clientErr = vaultClient.Sys().Health()
+		if clientErr != nil {
+			clientErr = errors.Wrapf(clientErr, "can not get health of %v", url)
+			finalErr = multierror.Append(finalErr, clientErr)
+			continue
+		}
+
+		client = vaultClient
+		logger.Info().Msgf("connected to %v", url)
+		break
+	}
+
+	if client == nil {
+		panic(finalErr)
+	}
 
 	ctx := logger.WithContext(context.Background())
 	if err != nil {
