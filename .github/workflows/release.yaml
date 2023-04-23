@@ -8,8 +8,6 @@ on:
 jobs:
   artifact:
     runs-on: ubuntu-latest
-    depends_on:
-      - artifact
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go
@@ -40,8 +38,7 @@ jobs:
           asset_content_type: application/octet-stream
   docker:
     runs-on: ubuntu-latest
-    depends_on:
-      - artifact
+    needs: [artifact]
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt-get update && sudo apt-get install curl build-essential git -y
