@@ -47,6 +47,10 @@ func main() {
 	logger := log.Logger
 	registerMetrics()
 
+	if vaultSecretsErr := checkVault(os.Getenv("VAULT_SECRETS_PATH"), logger); vaultSecretsErr != nil {
+		panic(vaultSecretsErr)
+	}
+
 	name := os.Getenv("VAULT_NAME")
 	if name == "" {
 		name = "default"

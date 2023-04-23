@@ -13,7 +13,7 @@ Vault-Backup is an automatic backup solution for HashiCorp Vault. The project is
 - Automated HashiCorp Vault backups
 - Supports AWS S3 as a backup destination
 - Prometheus metrics support with counters for successful and failed backup attempts
-
+- Automatically reads and applies environment variables from JSON files in a specified path when using the HashiCorp Vault Agent Sidecar Injector (see `VAULT_SECRETS_PATH`)
 ## Prerequisites
 
 - A running HashiCorp Vault instance
@@ -51,6 +51,7 @@ path "sys/storage/raft/snapshot" {
     capabilities = ["read"]
 }
 ```
+- `VAULT_SECRETS_PATH`: Path to HashiCorp Vault files. This is useful when using the HashiCorp Vault Agent Sidecar Injector. For more information, visit [Vault Agent Sidecar Injector documentation](https://developer.hashicorp.com/vault/docs/platform/k8s/injector). Files are expected to be in JSON format. The application will read the JSON files and apply the environment variables. Expected format: `{"key": "value"}`. (On linux system by default /vault/secrets/). **Disabled by default**.
 - S3 Configuration:
     - `S3_ACCESS_KEY`: Your S3 access key.
     - `S3_SECRET_KEY`: Your S3 secret key.
