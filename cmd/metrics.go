@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/prometheus/client_golang/prometheus/push"
+	"github.com/prometheus/common/expfmt"
 )
 
 func pushMetrics(prometheusPushGatewayUrl string) error {
@@ -19,5 +20,6 @@ func pushMetrics(prometheusPushGatewayUrl string) error {
 	return push.New(prometheusPushGatewayUrl, prometheusJobName).
 		Collector(successCounter).
 		Collector(failCounter).
+		Format(expfmt.FmtText).
 		Push()
 }
