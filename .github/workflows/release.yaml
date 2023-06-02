@@ -22,7 +22,7 @@ jobs:
           draft: false
           prerelease: false
           release_name: ${{ steps.version.outputs.version }}
-          tag_name: v.0.0.${{ github.run_number }}
+          tag_name: v.1.0.${{ github.run_number }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: upload artifact
